@@ -1,5 +1,4 @@
 // Vercel serverless function entry point
-// This file must be at root/api/ for Vercel to detect it properly
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -10,23 +9,34 @@ dotenv.config();
 
 const app = express();
 
-// Import routes - adjust paths for root-level api folder
-import authRoutes from '../backend/src/routes/auth';
-import orderRoutes from '../backend/src/routes/orders';
-import offerRoutes from '../backend/src/routes/offers';
-import matchRoutes from '../backend/src/routes/matches';
-import messageRoutes from '../backend/src/routes/messages';
-import userRoutes from '../backend/src/routes/users';
-import reviewRoutes from '../backend/src/routes/reviews';
+// Health check - Define FIRST before importing routes (routes import Prisma)
+// This ensures health endpoint works even if DATABASE_URL is missing
+app.get('/health', (req, res) => {
+  try {
+    res.json({ 
+      status: 'ok', 
+      message: 'Server is running', 
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development',
+      database: process.env.DATABASE_URL ? 'configured' : 'not configured'
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      status: 'error', 
+      message: 'Server error', 
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
 
-// CORS configuration - must allow specific origins when using credentials
+// CORS configuration
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   'https://yar-fetch-campus-deliver.vercel.app',
   'https://yar-fetch-campus-deliver-hbx79wqt2-uzairs-projects-31761ca9.vercel.app',
   'http://localhost:5173',
   'http://localhost:3000'
-].filter(Boolean); // Remove undefined values
+].filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -75,35 +85,35 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve static files (uploads)
-// Note: For production, consider using cloud storage (S3, Cloudinary) instead
 app.use('/uploads', express.static(path.join(__dirname, '../backend/uploads')));
 
-// Routes - Remove /api prefix since Vercel routing already handles it
-app.use('/auth', authRoutes);
-app.use('/users', userRoutes);
-app.use('/orders', orderRoutes);
-app.use('/offers', offerRoutes);
-app.use('/matches', matchRoutes);
-app.use('/messages', messageRoutes);
-app.use('/reviews', reviewRoutes);
+// Import routes AFTER health check - wrap in try-catch to handle missing DATABASE_URL
+let routesLoaded = false;
+try {
+  if (process.env.DATABASE_URL) {
+    const authRoutes = require('../backend/src/routes/auth').default;
+    const orderRoutes = require('../backend/src/routes/orders').default;
+    const offerRoutes = require('../backend/src/routes/offers').default;
+    const matchRoutes = require('../backend/src/routes/matches').default;
+    const messageRoutes = require('../backend/src/routes/messages').default;
+    const userRoutes = require('../backend/src/routes/users').default;
+    const reviewRoutes = require('../backend/src/routes/reviews').default;
 
-// Health check - Simple endpoint that doesn't require database
-app.get('/health', (req, res) => {
-  try {
-    res.json({ 
-      status: 'ok', 
-      message: 'Server is running', 
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'development'
-    });
-  } catch (error) {
-    res.status(500).json({ 
-      status: 'error', 
-      message: 'Server error', 
-      error: error instanceof Error ? error.message : 'Unknown error'
-    });
+    app.use('/auth', authRoutes);
+    app.use('/users', userRoutes);
+    app.use('/orders', orderRoutes);
+    app.use('/offers', offerRoutes);
+    app.use('/matches', matchRoutes);
+    app.use('/messages', messageRoutes);
+    app.use('/reviews', reviewRoutes);
+    routesLoaded = true;
+  } else {
+    console.warn('DATABASE_URL not set - API routes disabled. Health check still works.');
   }
-});
+} catch (error) {
+  console.error('Error loading routes (likely missing DATABASE_URL or Prisma not generated):', error);
+  // Health endpoint will still work
+}
 
 // Error handling middleware - must be after all routes
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

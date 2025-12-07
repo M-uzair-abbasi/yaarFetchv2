@@ -10,6 +10,7 @@ import messageRoutes from '../src/routes/messages';
 import userRoutes from '../src/routes/users';
 import reviewRoutes from '../src/routes/reviews';
 
+// Load environment variables first
 dotenv.config();
 
 const app = express();
@@ -35,9 +36,31 @@ app.use('/matches', matchRoutes);
 app.use('/messages', messageRoutes);
 app.use('/reviews', reviewRoutes);
 
-// Health check
+// Health check - Simple endpoint that doesn't require database
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Server is running', timestamp: new Date().toISOString() });
+  try {
+    res.json({ 
+      status: 'ok', 
+      message: 'Server is running', 
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development'
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      status: 'error', 
+      message: 'Server error', 
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Error handling middleware - must be after all routes
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('Error:', err);
+  res.status(500).json({ 
+    error: 'Internal server error', 
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+  });
 });
 
 // Export for Vercel serverless

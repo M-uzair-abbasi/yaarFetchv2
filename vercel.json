@@ -1,6 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "npm install && cd backend && npm install && npx prisma generate",
+  "installCommand": "npm install && cd backend && npm install",
+  "buildCommand": "cd backend && npx prisma generate",
   "builds": [
     {
       "src": "api/index.ts",

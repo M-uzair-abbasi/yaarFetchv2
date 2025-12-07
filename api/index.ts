@@ -39,6 +39,7 @@ const allowedOrigins = [
   'http://localhost:3000'
 ].filter(Boolean);
 
+// CORS middleware - handles all OPTIONS preflight requests automatically
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
@@ -56,22 +57,28 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  maxAge: 86400, // Cache preflight for 24 hours
 }));
 
-app.options('*', (req, res) => {
-  const origin = req.headers.origin;
-  if (!origin || 
-      process.env.NODE_ENV === 'development' || 
-      allowedOrigins.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin || '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Max-Age', '86400');
-    res.sendStatus(200);
-  } else {
-    res.status(403).json({ error: 'CORS policy: Origin not allowed' });
+// Handle OPTIONS requests explicitly for Express 5.x compatibility
+// Use a middleware approach instead of app.options('*')
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    const origin = req.headers.origin;
+    if (!origin || 
+        process.env.NODE_ENV === 'development' || 
+        allowedOrigins.includes(origin)) {
+      res.header('Access-Control-Allow-Origin', origin || '*');
+      res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+      res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+      res.header('Access-Control-Allow-Credentials', 'true');
+      res.header('Access-Control-Max-Age', '86400');
+      return res.sendStatus(200);
+    } else {
+      return res.status(403).json({ error: 'CORS policy: Origin not allowed' });
+    }
   }
+  next();
 });
 
 app.use(express.json());

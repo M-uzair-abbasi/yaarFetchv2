@@ -39,12 +39,13 @@ app.get('/health', (req, res) => {
 // CORS configuration
 app.use(cors({
   origin: [
-    "http://localhost:5173", // Local development
-    "https://yarfetchh.vercel.app", // Main Vercel Domain
-    "https://yar-fetch-campus-deliver.vercel.app" // Your other Vercel alias (optional, good to have)
+    "http://localhost:5173",
+    "https://yarfetchh.vercel.app",
+    "https://yaar-fetchv2-eight.vercel.app", // <--- Added this specific deployment URL
+    "https://yaar-fetchv2-production.vercel.app",
+    "https://yaarfetchv2-production.up.railway.app"
   ],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+  credentials: true
 }));
 
 // Handle OPTIONS requests explicitly for Express 5.x compatibility
@@ -55,7 +56,9 @@ app.use((req, res, next) => {
     const allowedOrigins = [
       "http://localhost:5173",
       "https://yarfetchh.vercel.app",
-      "https://yar-fetch-campus-deliver.vercel.app"
+      "https://yaar-fetchv2-eight.vercel.app",
+      "https://yaar-fetchv2-production.vercel.app",
+      "https://yaarfetchv2-production.up.railway.app"
     ];
     if (!origin || 
         process.env.NODE_ENV === 'development' || 

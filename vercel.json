@@ -29,12 +29,6 @@
       "src": "/(.*)",
       "dest": "frontend/dist/$1"
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/((?!api).*)",
-      "destination": "/index.html"
-    }
   ]
 }
 

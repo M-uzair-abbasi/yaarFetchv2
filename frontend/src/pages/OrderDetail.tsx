@@ -12,7 +12,7 @@ const OrderDetail = () => {
   const [order, setOrder] = useState<Order | null>(null);
   const [matches, setMatches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedMatch, setSelectedMatch] = useState<string | null>(null);
+  const [selectedMatch] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -41,15 +41,8 @@ const OrderDetail = () => {
     }
   };
 
-  const handleCreateMatch = async (offerId: string) => {
-    try {
-      await matchService.createMatch({ orderId: id!, offerId });
-      await loadMatches();
-      await loadOrder();
-    } catch (error: any) {
-      alert(error.response?.data?.error || 'Failed to create match');
-    }
-  };
+  // Note: handleCreateMatch function removed as it's not currently used
+  // If needed in the future, this can be re-implemented
 
   if (loading) {
     return <div className="container mx-auto px-4 py-8">Loading...</div>;

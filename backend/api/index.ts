@@ -2,6 +2,13 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+
+// Load environment variables first
+dotenv.config();
+
+const app = express();
+
+// Import routes
 import authRoutes from '../src/routes/auth';
 import orderRoutes from '../src/routes/orders';
 import offerRoutes from '../src/routes/offers';
@@ -9,11 +16,6 @@ import matchRoutes from '../src/routes/matches';
 import messageRoutes from '../src/routes/messages';
 import userRoutes from '../src/routes/users';
 import reviewRoutes from '../src/routes/reviews';
-
-// Load environment variables first
-dotenv.config();
-
-const app = express();
 
 // Middleware
 app.use(cors({

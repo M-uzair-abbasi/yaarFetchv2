@@ -1,0 +1,10 @@
+{
+  "name": "uzi-delivery-app",
+  "version": "1.0.0",
+  "scripts": {
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "build:backend": "cd backend && npm run vercel-build"
+  }
+}
+

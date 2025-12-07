@@ -9,7 +9,8 @@
           "backend/src/**",
           "backend/prisma/**",
           "backend/package.json"
-        ]
+        ],
+        "maxLambdaSize": "50mb"
       }
     },
     {

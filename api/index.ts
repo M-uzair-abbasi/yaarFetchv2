@@ -1,3 +1,5 @@
+// Vercel serverless function entry point
+// This file must be at root/api/ for Vercel to detect it properly
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -8,14 +10,14 @@ dotenv.config();
 
 const app = express();
 
-// Import routes
-import authRoutes from '../src/routes/auth';
-import orderRoutes from '../src/routes/orders';
-import offerRoutes from '../src/routes/offers';
-import matchRoutes from '../src/routes/matches';
-import messageRoutes from '../src/routes/messages';
-import userRoutes from '../src/routes/users';
-import reviewRoutes from '../src/routes/reviews';
+// Import routes - adjust paths for root-level api folder
+import authRoutes from '../backend/src/routes/auth';
+import orderRoutes from '../backend/src/routes/orders';
+import offerRoutes from '../backend/src/routes/offers';
+import matchRoutes from '../backend/src/routes/matches';
+import messageRoutes from '../backend/src/routes/messages';
+import userRoutes from '../backend/src/routes/users';
+import reviewRoutes from '../backend/src/routes/reviews';
 
 // CORS configuration - must allow specific origins when using credentials
 const allowedOrigins = [
@@ -74,7 +76,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve static files (uploads)
 // Note: For production, consider using cloud storage (S3, Cloudinary) instead
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/uploads', express.static(path.join(__dirname, '../backend/uploads')));
 
 // Routes - Remove /api prefix since Vercel routing already handles it
 app.use('/auth', authRoutes);
@@ -114,4 +116,3 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 
 // Export for Vercel serverless
 export default app;
-

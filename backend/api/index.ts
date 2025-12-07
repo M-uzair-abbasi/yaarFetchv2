@@ -26,17 +26,17 @@ app.use(express.urlencoded({ extended: true }));
 // Note: For production, consider using cloud storage (S3, Cloudinary) instead
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/offers', offerRoutes);
-app.use('/api/matches', matchRoutes);
-app.use('/api/messages', messageRoutes);
-app.use('/api/reviews', reviewRoutes);
+// Routes - Remove /api prefix since Vercel routing already handles it
+app.use('/auth', authRoutes);
+app.use('/users', userRoutes);
+app.use('/orders', orderRoutes);
+app.use('/offers', offerRoutes);
+app.use('/matches', matchRoutes);
+app.use('/messages', messageRoutes);
+app.use('/reviews', reviewRoutes);
 
 // Health check
-app.get('/api/health', (req, res) => {
+app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Server is running', timestamp: new Date().toISOString() });
 });
 

@@ -4,7 +4,7 @@
   "scripts": {
     "install:backend": "cd backend && npm install",
     "install:frontend": "cd frontend && npm install",
-    "build:backend": "cd backend && npm run vercel-build"
+    "build:backend": "cd backend && npm install && npx prisma generate",
+    "vercel-build": "cd backend && npm install && npx prisma generate"
   }
 }
-

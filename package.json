@@ -1,10 +1,16 @@
 {
   "name": "uzi-delivery-app",
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
     "install:backend": "cd backend && npm install",
     "install:frontend": "cd frontend && npm install",
     "build:backend": "cd backend && npm install && npx prisma generate",
-    "vercel-build": "cd backend && npm install && npx prisma generate && cd ../api && npm install"
+    "vercel-build": "cd backend && npm install && npx prisma generate"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3"
   }
 }

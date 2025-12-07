@@ -37,33 +37,14 @@ app.get('/health', (req, res) => {
 });
 
 // CORS configuration
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  'https://yar-fetch-campus-deliver.vercel.app',
-  'https://yar-fetch-campus-deliver-hbx79wqt2-uzairs-projects-31761ca9.vercel.app',
-  'http://localhost:5173',
-  'http://localhost:3000'
-].filter(Boolean);
-
-// CORS middleware - handles all OPTIONS preflight requests automatically
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    if (process.env.NODE_ENV === 'development') {
-      return callback(null, true);
-    }
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.warn(`CORS blocked origin: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: [
+    "http://localhost:5173", // Local development
+    "https://yarfetchh.vercel.app", // Main Vercel Domain
+    "https://yar-fetch-campus-deliver.vercel.app" // Your other Vercel alias (optional, good to have)
+  ],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  exposedHeaders: ['Content-Range', 'X-Content-Range'],
-  maxAge: 86400, // Cache preflight for 24 hours
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
 
 // Handle OPTIONS requests explicitly for Express 5.x compatibility
@@ -71,6 +52,11 @@ app.use(cors({
 app.use((req, res, next) => {
   if (req.method === 'OPTIONS') {
     const origin = req.headers.origin;
+    const allowedOrigins = [
+      "http://localhost:5173",
+      "https://yarfetchh.vercel.app",
+      "https://yar-fetch-campus-deliver.vercel.app"
+    ];
     if (!origin || 
         process.env.NODE_ENV === 'development' || 
         allowedOrigins.includes(origin)) {

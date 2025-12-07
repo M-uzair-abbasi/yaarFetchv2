@@ -87,17 +87,35 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static files (uploads)
 app.use('/uploads', express.static(path.join(__dirname, '../backend/uploads')));
 
-// Import routes AFTER health check - wrap in try-catch to handle missing DATABASE_URL
+// Load routes dynamically - only if DATABASE_URL is set
+// This prevents Prisma from initializing when DATABASE_URL is missing
 let routesLoaded = false;
-try {
-  if (process.env.DATABASE_URL) {
-    const authRoutes = require('../backend/src/routes/auth').default;
-    const orderRoutes = require('../backend/src/routes/orders').default;
-    const offerRoutes = require('../backend/src/routes/offers').default;
-    const matchRoutes = require('../backend/src/routes/matches').default;
-    const messageRoutes = require('../backend/src/routes/messages').default;
-    const userRoutes = require('../backend/src/routes/users').default;
-    const reviewRoutes = require('../backend/src/routes/reviews').default;
+
+async function loadRoutes() {
+  if (!process.env.DATABASE_URL) {
+    console.warn('DATABASE_URL not set - API routes disabled. Health check still works.');
+    return;
+  }
+
+  try {
+    // Use dynamic imports to load routes lazily
+    const [
+      { default: authRoutes },
+      { default: orderRoutes },
+      { default: offerRoutes },
+      { default: matchRoutes },
+      { default: messageRoutes },
+      { default: userRoutes },
+      { default: reviewRoutes }
+    ] = await Promise.all([
+      import('../backend/src/routes/auth'),
+      import('../backend/src/routes/orders'),
+      import('../backend/src/routes/offers'),
+      import('../backend/src/routes/matches'),
+      import('../backend/src/routes/messages'),
+      import('../backend/src/routes/users'),
+      import('../backend/src/routes/reviews')
+    ]);
 
     app.use('/auth', authRoutes);
     app.use('/users', userRoutes);
@@ -106,14 +124,19 @@ try {
     app.use('/matches', matchRoutes);
     app.use('/messages', messageRoutes);
     app.use('/reviews', reviewRoutes);
+    
     routesLoaded = true;
-  } else {
-    console.warn('DATABASE_URL not set - API routes disabled. Health check still works.');
+    console.log('API routes loaded successfully');
+  } catch (error) {
+    console.error('Error loading routes:', error);
+    // Health endpoint will still work
   }
-} catch (error) {
-  console.error('Error loading routes (likely missing DATABASE_URL or Prisma not generated):', error);
-  // Health endpoint will still work
 }
+
+// Load routes asynchronously
+loadRoutes().catch(err => {
+  console.error('Failed to load routes:', err);
+});
 
 // Error handling middleware - must be after all routes
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

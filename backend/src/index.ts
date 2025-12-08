@@ -22,16 +22,36 @@ dotenv.config();
 const app = express();
 
 // 1. CORS - The only security guard we need
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://yarfetchh.vercel.app",
+  "https://yaar-fetchv2-eight.vercel.app",
+  "https://yaar-fetchv2-production.vercel.app",
+  "https://yaarfetchv2-production.up.railway.app"
+];
+
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://yarfetchh.vercel.app",
-    "https://yaar-fetchv2-eight.vercel.app",
-    "https://yaar-fetchv2-production.vercel.app",
-    "https://yaarfetchv2-production.up.railway.app"
-  ],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) {
+      return callback(null, true);
+    }
+    
+    // Normalize origin (remove trailing slash)
+    const normalizedOrigin = origin.replace(/\/$/, '');
+    
+    // Check if origin is allowed
+    if (allowedOrigins.some(allowed => allowed === normalizedOrigin || allowed === origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range']
 }));
 
 // 2. Logging - To debug if requests reach the server

@@ -4,13 +4,13 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import authRoutes from './routes/auth';
-import orderRoutes from './routes/orders';
-import offerRoutes from './routes/offers';
-import matchRoutes from './routes/matches';
-import messageRoutes from './routes/messages';
-import userRoutes from './routes/users';
-import reviewRoutes from './routes/reviews';
+import authRoutes from './routes/auth.js';
+import orderRoutes from './routes/orders.js';
+import offerRoutes from './routes/offers.js';
+import matchRoutes from './routes/matches.js';
+import messageRoutes from './routes/messages.js';
+import userRoutes from './routes/users.js';
+import reviewRoutes from './routes/reviews.js';
 
 dotenv.config();
 

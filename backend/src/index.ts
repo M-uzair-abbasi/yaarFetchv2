@@ -23,13 +23,11 @@ const app = express();
 
 // 1. CORS - The only security guard we need
 const allowedOrigins = [
-  "http://localhost:5173",
-  "https://yarfetchh.vercel.app",
-  "https://yaar-fetchv2-eight.vercel.app/api",
-  "https://yaar-fetchv2-eight.vercel.app",
-  "https://yaar-fetchv2-production.vercel.app",
-  "https://yaarfetchv2-production.up.railway.app",
-  "https://yaarfetchv2-production.up.railway.app/api"
+    "http://localhost:5173",
+    "https://yarfetchh.vercel.app",
+    "https://yaar-fetchv2-eight.vercel.app",
+    "https://yaar-fetchv2-production.vercel.app",
+    "https://yaarfetchv2-production.up.railway.app"
 ];
 
 app.use(cors({

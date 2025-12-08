@@ -1,6 +1,6 @@
 import { Response } from 'express';
-import { AuthRequest } from '../middleware/auth';
-import prisma from '../utils/prisma';
+import { AuthRequest } from '../middleware/auth.js';
+import prisma from '../utils/prisma.js';
 
 export const createReview = async (req: AuthRequest, res: Response) => {
   try {
@@ -92,7 +92,7 @@ export const createReview = async (req: AuthRequest, res: Response) => {
       select: { rating: true },
     });
 
-    const averageRating = allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length;
+    const averageRating = allReviews.reduce((sum: number, r: any) => sum + r.rating, 0) / allReviews.length;
 
     await prisma.user.update({
       where: { id: revieweeId },

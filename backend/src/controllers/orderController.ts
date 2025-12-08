@@ -1,6 +1,6 @@
 import { Response } from 'express';
-import { AuthRequest } from '../middleware/auth';
-import prisma from '../utils/prisma';
+import { AuthRequest } from '../middleware/auth.js';
+import prisma from '../utils/prisma.js';
 
 export const createOrder = async (req: AuthRequest, res: Response) => {
   try {
@@ -80,7 +80,7 @@ export const getOrders = async (req: any, res: Response) => {
     let filteredOrders = orders;
     if (campus) {
       filteredOrders = orders.filter(
-        (order) => order.creator.campus === campus
+        (order: any) => order.creator.campus === campus
       );
     }
 
